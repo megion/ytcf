@@ -12,7 +12,7 @@ CC := g++ #clang++ #g++
 # -lX11 for X11 lib
 # -g for include debugging symbols
 # -pthread enable multithreading
-CCFLAGS := -std=c++11 -lxcb -g -pthread -lpng
+CCFLAGS := -std=c++11 -g
 
 # список каталогов с исходыми кодами
 SRC_DIRS := $(shell find ../src -type d)
@@ -20,6 +20,7 @@ TEST_DIRS := $(shell find ../test -type d) $(SRC_DIRS)
 
 # список всех файлов *.cpp
 SRC := $(shell find ../src -name *.cpp)
+# test files contains all files in ../src and exclude ytcf-main file
 TEST_SRC := $(shell find {../test,../src} -name *.cpp | sed '/ytcf-main/d')
 
 # Укороченный вызов функции patsubst
