@@ -3,8 +3,73 @@
 namespace test {
 namespace ytcf {
 
-size_t group_min_points(std::vector<unsigned int> points, size_t rMax)
+size_t calculate_distance(std::vector<unsigned int>& points, size_t a, size_t b)
 {
+    long dd = (long)points[a] - (long)points[b];
+
+    size_t d = 0;
+    if (dd < 0) {
+        d = -dd;
+    }
+    else {
+        d = dd;
+    }
+    return d;
+}
+
+size_t find_nearest_points(std::vector<unsigned int>& points, size_t rMax,
+                           size_t groupCount)
+{
+    size_t maxNeighbourCount = 0;
+    size_t maxNeighbourIndex = 0;
+    std::vector<unsigned int> maxNeighbourFarPoints;
+
+    for (size_t i = 0; i < points.size(); i++) {
+        size_t neighbourCount = 0;
+        std::vector<unsigned int> farPoints;
+        for (size_t j = 0; j < points.size(); j++) {
+            if (i == j) {
+                continue;
+            }
+
+            size_t d = calculate_distance(points, i, j);
+            if (d <= rMax) {
+                neighbourCount++;
+            }
+            else {
+                farPoints.push_back(points[j]);
+            }
+        }
+
+        if (neighbourCount > maxNeighbourCount) {
+            maxNeighbourCount = neighbourCount;
+            maxNeighbourIndex = i;
+            maxNeighbourFarPoints = farPoints;
+        }
+    }
+
+    LOG(WARN, "maxNeighbourCount %lu", maxNeighbourCount);
+    LOG(WARN, "maxNeighbourIndex %lu", maxNeighbourIndex);
+
+    if (maxNeighbourFarPoints.size() != 0) {
+        //groupCount++;
+        groupCount +=
+            find_nearest_points(maxNeighbourFarPoints, rMax, groupCount);
+        return 1;
+    }
+    return 0;
+
+    // LOG(WARN, "groupCount %lu", groupCount);
+    //return groupCount;
+    // if(maxNeighbourCount == 0) {
+    // return points.size();
+    //}
+}
+
+size_t group_min_points(std::vector<unsigned int>& points, size_t rMax)
+{
+    find_nearest_points(points, rMax, 0);
+
     size_t minCount = 0;
     size_t count = 0;
     for (size_t i = 0; i < points.size(); i++) {
@@ -17,7 +82,7 @@ size_t group_min_points(std::vector<unsigned int> points, size_t rMax)
 
             long dd = (long)points[i] - (long)points[j];
 
-            //LOG(WARN, "dd %ld", dd);
+            // LOG(WARN, "dd %ld", dd);
             size_t d = 0;
             if (dd < 0) {
                 d = -dd;
@@ -25,12 +90,12 @@ size_t group_min_points(std::vector<unsigned int> points, size_t rMax)
             else {
                 d = dd;
             }
-            //LOG(WARN, "d %ld", d);
+            // LOG(WARN, "d %ld", d);
             if (d <= rMax) {
                 LOG(WARN, "d %ld, rMax %ld", d, rMax);
                 if (d > dmax) {
-                    //if (count == 0) {
-                        count++;
+                    // if (count == 0) {
+                    count++;
                     //}
                     dmax = d;
                 }
@@ -55,7 +120,7 @@ size_t group_min_points(std::vector<unsigned int> points, size_t rMax)
 void test_group_min_points()
 {
     std::vector<unsigned int> points = {6, 2, 4, 3, 5, 1};
-    size_t minCount = group_min_points(points, 2);
+    size_t minCount = group_min_points(points, 1);
     LOG(WARN, "minCount %lu", minCount);
     assert(minCount == 2);
 }
