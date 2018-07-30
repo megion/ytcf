@@ -17,12 +17,16 @@ size_t calculate_distance(std::vector<unsigned int>& points, size_t a, size_t b)
     return d;
 }
 
+/**
+ * calculate mutual points distance  
+ * find maxNeighbours where distance < rmax(R)
+ */
 size_t find_nearest_points(std::vector<unsigned int>& points, size_t rMax,
                            size_t groupCount)
 {
-    size_t maxNeighbourCount = 0;
+    size_t maxNearestNeighbourCount = 0;
     size_t maxNeighbourIndex = 0;
-    std::vector<unsigned int> maxNeighbourFarPoints;
+    std::vector<unsigned int> maxFarPoints;
 
     for (size_t i = 0; i < points.size(); i++) {
         size_t neighbourCount = 0;
@@ -41,27 +45,28 @@ size_t find_nearest_points(std::vector<unsigned int>& points, size_t rMax,
             }
         }
 
-        if (neighbourCount > maxNeighbourCount) {
-            maxNeighbourCount = neighbourCount;
+        if (neighbourCount > maxNearestNeighbourCount) {
+            maxNearestNeighbourCount = neighbourCount;
             maxNeighbourIndex = i;
-            maxNeighbourFarPoints = farPoints;
+            // assign operator
+            maxFarPoints = farPoints;
         }
     }
 
-    LOG(WARN, "maxNeighbourCount %lu", maxNeighbourCount);
+    LOG(WARN, "maxNearestNeighbourCount %lu", maxNearestNeighbourCount);
     LOG(WARN, "maxNeighbourIndex %lu", maxNeighbourIndex);
 
-    if (maxNeighbourFarPoints.size() != 0) {
+    if (maxFarPoints.size() != 0) {
         //groupCount++;
         groupCount +=
-            find_nearest_points(maxNeighbourFarPoints, rMax, groupCount);
+            find_nearest_points(maxFarPoints, rMax, groupCount);
         return 1;
     }
     return 0;
 
     // LOG(WARN, "groupCount %lu", groupCount);
     //return groupCount;
-    // if(maxNeighbourCount == 0) {
+    // if(maxNearestNeighbourCount == 0) {
     // return points.size();
     //}
 }
